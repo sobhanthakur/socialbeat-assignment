@@ -1,5 +1,6 @@
 const Order = require("../../models/Order");
 const Product = require("../../models/Product");
+const Detail = require("../../models/Detail");
 
 /*
  * Add to Cart
@@ -62,9 +63,19 @@ const remove = async (req, res) => {
  */
 const cartItems = async (req, res) => {
   try {
-    order = await Order.find({ user: req.user.id, status: false });
-
-    res.json(order);
+    // order = await Order.find({ user: req.user.id, status: false });
+    order = await Order.aggregate([
+      {
+        $lookup: {
+          from: "products", // collection name in db
+          localField: "product",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+    ]).exec(function (err, orders) {
+      res.json(orders);
+    });
   } catch (err) {
     console.error(err.message);
     return res.status(500).send("Server Error");
@@ -73,4 +84,34 @@ const cartItems = async (req, res) => {
   return res;
 };
 
-module.exports = { add, remove, cartItems };
+/*
+ * Check Out
+ */
+const checkout = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    detail = new Detail({
+      name,
+      email,
+      user: req.user.id,
+    });
+
+    // Save details
+    await detail.save();
+
+    await Order.updateMany(
+      { user: req.user.id, status: false },
+      { $set: { status: true, details: detail } }
+    );
+
+    res.json({ msg: "Order Placed Successfully" });
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).send("Server Error");
+  }
+
+  return res;
+};
+
+module.exports = { add, remove, cartItems, checkout };

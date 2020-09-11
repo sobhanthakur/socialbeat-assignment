@@ -41,4 +41,26 @@ router.get("/", auth, (req, res) => {
   return orderService.cartItems(req, res);
 });
 
+// @route    PUT api/orders
+// @desc     Checkout
+// @access   Public
+
+router.put(
+  "/",
+  [
+    auth,
+    check("name", "Name must be present").not().isEmpty(),
+    check("email", "Please Include a valid email").isEmail(),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+
+    // Throw Exception if validation fails
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    return orderService.checkout(req, res);
+  }
+);
 module.exports = router;
