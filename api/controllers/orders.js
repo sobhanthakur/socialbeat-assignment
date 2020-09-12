@@ -63,4 +63,12 @@ router.put(
     return orderService.checkout(req, res);
   }
 );
+
+// @route    Get api/orders
+// @desc     Get All Orders
+// @access   Public
+
+router.get("/all", (req, res) => {
+  return orderService.allOrders(req, res);
+});
 module.exports = router;

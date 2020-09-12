@@ -1,8 +1,7 @@
 const Order = require("../../models/Order");
 const Product = require("../../models/Product");
 const Detail = require("../../models/Detail");
-const nodemailer = require('nodemailer');
-
+const nodemailer = require("nodemailer");
 
 /*
  * Add to Cart
@@ -73,7 +72,10 @@ const remove = async (req, res) => {
  */
 const cartItems = async (req, res) => {
   try {
-    order = await Order.find({ user: req.user.id, status: false }).populate('product','title image price');
+    order = await Order.find({ user: req.user.id, status: false }).populate(
+      "product",
+      "title image price"
+    );
     res.json(order);
   } catch (err) {
     console.error(err.message);
@@ -88,11 +90,14 @@ const cartItems = async (req, res) => {
  */
 const checkout = async (req, res) => {
   try {
+    order = await Order.find({ user: req.user.id, status: false }).populate(
+      "product",
+      "title price"
+    );
 
-    order = await Order.find({ user: req.user.id, status: false }).populate('product','title price');
+    if (order.length === 0)
+      return res.status(404).json({ msg: "Cart is Empty" });
 
-    if (order.length === 0) return res.status(404).json({ msg: "Cart is Empty" });
-    
     const { name, email } = req.body;
 
     detail = new Detail({
@@ -104,12 +109,15 @@ const checkout = async (req, res) => {
     // Save details
     await detail.save();
 
-    await Order.updateMany(order, { $set: { status: true, details: detail } });
+    await Order.updateMany(
+      { user: req.user.id, status: false },
+      { $set: { status: true, details: detail } }
+    );
 
     // Send Order confirmation mail to User
-    await sendMail(order,name,email)
+    await sendMail(order, name, email);
 
-    res.json({msg:"Mail Sent Successfuly"});
+    res.json({ msg: "Mail Sent Successfuly" });
   } catch (err) {
     console.error(err.message);
     return res.status(500).send("Server Error");
@@ -118,18 +126,34 @@ const checkout = async (req, res) => {
   return res;
 };
 
-// Send Mail 
-const sendMail = async (order,name,email) => {
+/*
+ * All Orders
+ */
+const allOrders = async (req, res) => {
+  try {
+    orders = await Order.find({ status: true }).populate("product","title price").populate("details","name email");
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).send("Server Error");
+  }
+
+  return res;
+};
+
+// Send Mail
+const sendMail = async (order, name, email) => {
   var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
       user: process.env.EMAIL,
-      pass: process.env.PASSWORD
-    }
+      pass: process.env.PASSWORD,
+    },
   });
 
   let price = 0;
-  let msg = 'Hi '+name+"\n";
+  let msg = "Hi " + name + "\n";
   msg += "Your following orders are placed:\n";
 
   for (var i in order) {
@@ -139,18 +163,18 @@ const sendMail = async (order,name,email) => {
 
   msg += "Total Amount : " + price;
 
-
   var mailOptions = {
     from: process.env.EMAIL,
     to: email,
-    subject: 'Order Details',
-    text: msg
+    subject: "Order Details",
+    text: msg,
   };
 
-  await transporter.sendMail(mailOptions, function(error, info){
+  await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
+      console.log(error);
     }
   });
-}
+};
 
-module.exports = { add, remove, cartItems, checkout };
+module.exports = { add, remove, cartItems, checkout, allOrders };
