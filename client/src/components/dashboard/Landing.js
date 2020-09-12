@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Button, Container, Row, Col } from "reactstrap";
+import { Button, Row, Col } from "reactstrap";
 import { getProducts } from "../../services/ajaxCalls";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../redux/actions/cartAction";
+import { withRouter } from "react-router-dom";
 
-const Landing = () => {
+const Landing = ({history}) => {
   const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getProducts().then((data) => {
@@ -13,8 +17,8 @@ const Landing = () => {
   return (
     <div className="mt-5">
       {products.map((product) => (
-        <>
-          <Row key={product._id}>
+        <React.Fragment key={product._id}>
+          <Row>
             <Col xs="4">
               <img
                 id="customImage"
@@ -33,15 +37,15 @@ const Landing = () => {
               </Row>
               <Row>{product.description}</Row>
               <Row>
-                <Button color="success">Add To Cart</Button>
+                <Button color="success" onClick={e => dispatch(addToCart(product,history))}>Add To Cart</Button>
               </Row>
             </Col>
           </Row>
           <hr />
-        </>
+        </React.Fragment>
       ))}
     </div>
   );
 };
 
-export default Landing;
+export default withRouter(Landing);

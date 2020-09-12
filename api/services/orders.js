@@ -131,7 +131,9 @@ const checkout = async (req, res) => {
  */
 const allOrders = async (req, res) => {
   try {
-    orders = await Order.find({ status: true }).populate("product","title price").populate("details","name email");
+    orders = await Order.find({ status: true })
+      .populate("product", "title price")
+      .populate("details", "name email");
 
     res.json(orders);
   } catch (err) {
