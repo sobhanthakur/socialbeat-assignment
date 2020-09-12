@@ -1,0 +1,26 @@
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import Login from "../../components/auth/Login";
+import AlertComponent from "../layout/AlertComponent";
+import PrivateRoute from "./PrivateRoute";
+import Landing from "../dashboard/Landing";
+import { useSelector } from "react-redux";
+import Register from "../auth/Register";
+
+const Routes = (props) => {
+  const state = useSelector((state) => ({
+    auth: state.authReducer.isAuthenticated,
+  }));
+  return (
+    <div className="container">
+      <AlertComponent></AlertComponent>
+      <Switch>
+        <Route exact path="/login" component={Login} />
+        <Route exact path="/register" component={Register} />
+        <Route exact path="/" component={Landing}></Route>
+      </Switch>
+    </div>
+  );
+};
+
+export default Routes;

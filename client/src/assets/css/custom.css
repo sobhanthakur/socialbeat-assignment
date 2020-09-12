@@ -1,0 +1,16 @@
+@media screen and (min-width: 768px) {
+  #loginCustom {
+    width: 500px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  #customImage {
+      width: 100%;
+      height: 100%;
+  }
+
+  #customFont h6 {
+      font-size: 14px;
+  }
+}
