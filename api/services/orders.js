@@ -131,9 +131,17 @@ const checkout = async (req, res) => {
  */
 const allOrders = async (req, res) => {
   try {
-    orders = await Order.find({ status: true })
-      .populate("product", "title price")
-      .populate("details", "name email");
+    var orders = [];
+    detail = await Detail.find().sort({
+      createdAt: -1,
+    });
+    for (var i in detail) {
+      orders.push(
+        await Order.find({ details: detail[i]._id })
+          .populate("details", "email")
+          .populate("product", "title")
+      );
+    }
 
     res.json(orders);
   } catch (err) {
@@ -148,8 +156,8 @@ const allOrders = async (req, res) => {
 const sendMail = async (order, name, email) => {
   var transporter = nodemailer.createTransport({
     service: "gmail",
-    port:465,
-    secure:true,
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,

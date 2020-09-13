@@ -9,3 +9,13 @@ export const getProducts = async () => {
     console.log(err);
   }
 };
+
+// Get All Orders
+export const getOrders = async () => {
+  try {
+    const res = await axios.get("/api/orders/all");
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
