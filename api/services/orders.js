@@ -148,6 +148,8 @@ const allOrders = async (req, res) => {
 const sendMail = async (order, name, email) => {
   var transporter = nodemailer.createTransport({
     service: "gmail",
+    port:465,
+    secure:true,
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
