@@ -6,6 +6,7 @@ import PrivateRoute from "./PrivateRoute";
 import Landing from "../dashboard/Landing";
 import { useSelector } from "react-redux";
 import Register from "../auth/Register";
+import Cart from "../dashboard/Cart";
 
 const Routes = (props) => {
   const state = useSelector((state) => ({
@@ -18,6 +19,7 @@ const Routes = (props) => {
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/" component={Landing}></Route>
+        <PrivateRoute exact path="/cart" component={Cart}></PrivateRoute>
       </Switch>
     </div>
   );

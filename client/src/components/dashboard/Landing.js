@@ -3,9 +3,9 @@ import { Button, Row, Col } from "reactstrap";
 import { getProducts } from "../../services/ajaxCalls";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/actions/cartAction";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 
-const Landing = ({history}) => {
+const Landing = ({ history }) => {
   const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
 
@@ -16,6 +16,11 @@ const Landing = ({history}) => {
   }, []);
   return (
     <div className="mt-5">
+      <Link to="/cart">
+        <Button color="warning" className="mb-3">
+          Go To Cart
+        </Button>
+      </Link>
       {products.map((product) => (
         <React.Fragment key={product._id}>
           <Row>
@@ -37,7 +42,12 @@ const Landing = ({history}) => {
               </Row>
               <Row>{product.description}</Row>
               <Row>
-                <Button color="success" onClick={e => dispatch(addToCart(product,history))}>Add To Cart</Button>
+                <Button
+                  color="success"
+                  onClick={(e) => dispatch(addToCart(product, history))}
+                >
+                  Add To Cart
+                </Button>
               </Row>
             </Col>
           </Row>
